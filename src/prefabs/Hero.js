@@ -207,5 +207,6 @@ class SpinState extends State {
         hero.play('spin-attack').once('animationcomplete', () => {
             this.stateMachine.transition('idle')
         })
+        scene.cameras.main.shake(250, 0.01)
     }
 }
