@@ -1,6 +1,6 @@
 // Code Practice: Scrolling States
-// Name:
-// Date: 
+// Name: Lyssa Li
+// Date: 2024 02 09
 
 'use strict'
 

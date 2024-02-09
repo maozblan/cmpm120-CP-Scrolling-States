@@ -66,6 +66,19 @@ class Load extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('hero', { start: 28, end: 31 }),
         })
 
+        // add circular attack
+        // there is no circular attack, we are piecing it together through the current frames
+        this.anims.create({
+            key: 'spin-attack',
+            frameRate: 24,
+            repeat: 0, // play once, repeat of 0
+            frames: this.anims.generateFrameNumbers('hero', {
+                frames: [16, 16, 16, 17, 18, 24, 25, 26, 21, 22, 30, 29, 28, 18, 19, 19, 19, 19]
+                // frames on the spirtesheeet count horizontally then vertically
+                // 3 of the same numbers -> "changing frame rate" -> lingering on a frame
+            }),
+        })
+
         // proceed once loading completes
         this.scene.start('playScene')
     }
