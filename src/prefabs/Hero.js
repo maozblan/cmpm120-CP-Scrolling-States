@@ -21,12 +21,13 @@ class Hero extends Phaser.Physics.Arcade.Sprite {
             swing: new SwingState(),
             dash: new DashState(),
             hurt: new HurtState(),
+            spin: new SpinState(),
         }, [scene, this])   // pass these as arguments to maintain scene/object context in the FSM
     }
 }
 
 // hero-specific state classes
-class IdleState extends State {
+class IdleState extends State { // we are extending so we can have that enter/execute structure
     enter(scene, hero) {
         hero.setVelocity(0)
         hero.anims.play(`walk-${hero.direction}`)
@@ -37,6 +38,7 @@ class IdleState extends State {
         // use destructuring to make a local copy of the keyboard object
         const { left, right, up, down, space, shift } = scene.keys
         const HKey = scene.keys.HKey
+        const FKey = scene.keys.FKey // we we already defined it in play.js
 
         // transition to swing if pressing space
         if(Phaser.Input.Keyboard.JustDown(space)) {
@@ -56,6 +58,12 @@ class IdleState extends State {
             return
         }
 
+        // state transition to spin
+        if (Phaser.Input.Keyboard.JustDown(FKey)) {
+            this.stateMachine.transition('spin')
+            return // the return makes it kick out of the function, like "short circuiting"
+        }
+
         // transition to move if pressing a movement key
         if(left.isDown || right.isDown || up.isDown || down.isDown ) {
             this.stateMachine.transition('move')
@@ -69,6 +77,7 @@ class MoveState extends State {
         // use destructuring to make a local copy of the keyboard object
         const { left, right, up, down, space, shift } = scene.keys
         const HKey = scene.keys.HKey
+        const FKey = scene.keys.FKey
 
         // transition to swing if pressing space
         if(Phaser.Input.Keyboard.JustDown(space)) {
@@ -91,6 +100,12 @@ class MoveState extends State {
         // transition to idle if not pressing movement keys
         if(!(left.isDown || right.isDown || up.isDown || down.isDown)) {
             this.stateMachine.transition('idle')
+            return
+        }
+
+        // state transition to spin
+        if (Phaser.Input.Keyboard.JustDown(FKey)) {
+            this.stateMachine.transition('spin')
             return
         }
 
@@ -180,6 +195,16 @@ class HurtState extends State {
         // set recovery timer
         scene.time.delayedCall(hero.hurtTimer, () => {
             hero.clearTint()
+            this.stateMachine.transition('idle')
+        })
+    }
+}
+
+class SpinState extends State {
+    enter(scene, hero) {
+        // hero.setTint(0x0000FF) // setTint only works in webGL mode
+        hero.setVelocity(0)
+        hero.play('spin-attack').once('animationcomplete', () => {
             this.stateMachine.transition('idle')
         })
     }
